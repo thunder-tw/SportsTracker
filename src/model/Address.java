@@ -1,3 +1,10 @@
+/**
+ * @Autor: Mathy Paesen
+ * @Team: N/A
+ * @Date: N/A
+ * @Project: SportsTracker
+ * @Purpose: Adres-gegevens beheren + contact-gegevens 
+ */
 package model;
 
 public class Address {

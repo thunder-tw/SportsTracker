@@ -3,7 +3,7 @@
  * @Team: Team08
  * @Date: 10/26/2015
  * @Project: SportsTracker
- * @Purpose: gegevens van een Training beheren 
+ * @Purpose: Training-gegevens beheren 
  */
 
 package model;
