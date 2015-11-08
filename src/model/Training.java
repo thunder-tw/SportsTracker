@@ -49,7 +49,7 @@ public class Training implements Cloneable {
 
 	public String toString() {
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-		return String.format("%-12s\t%s\t%.2fkm.\t%dsec.", type.toString(), format1.format(datum.getTime()), afstand, tijdInSec);
+		return String.format("%-12s\t%s\t%.2f km.\t%d sec.", type.toString(), format1.format(datum.getTime()), afstand, tijdInSec);
 	}
 
 	public Training clone() {

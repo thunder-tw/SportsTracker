@@ -7,14 +7,12 @@
  */
 package application;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.Random;
 
 import model.Address;
 import model.ESportType;
@@ -23,25 +21,62 @@ import model.TrainingManager;
 
 public class TrainingBeheer {
 	TrainingManager manager;
+	IOTool ioTool;
 
 	public TrainingBeheer() {
 		manager = new TrainingManager();
+		ioTool = new IOTool();
 	}
 
-	public TrainingBeheer(int x) {
+	public TrainingBeheer(int aantalTestTrainingen) {
 		manager = new TrainingManager();
-		for( int i = 0; i < x; i++)
-		{
-			manager.addTraining(new Training( ESportType.lopen,
-					Calendar.getInstance(), 100.1,120,null));
+		ioTool = new IOTool();
+
+		if (aantalTestTrainingen == 0)
+			aantalTestTrainingen = ioTool.vraagInteger("Aantal test elementen > ");
+
+		Random rand = new Random();
+		ESportType type;
+		Address adres = new Address();
+		adres.setStreet("Teststraat");
+		adres.setCity("Teststad");
+
+		for (int i = 0; i < aantalTestTrainingen; i++) {
+			switch (rand.nextInt(5)) {
+			case 0:
+				type = ESportType.fietsen;
+				break;
+			case 1:
+				type = ESportType.lopen;
+				break;
+			case 2:
+				type = ESportType.sprinten;
+				break;
+			case 3:
+				type = ESportType.triathlon;
+				break;
+			case 4:
+				type = ESportType.wandelen;
+				break;
+			default:
+				type = ESportType.zwemmen;
+				break;
+			}
+			adres.setNumber(Integer.toString(rand.nextInt(400)));
+			adres.setZipCode(Integer.toString(rand.nextInt(600)*10));
+			manager.addTraining(
+					new Training(type, Calendar.getInstance(), rand.nextDouble(), rand.nextInt(3600), adres));
 		}
+		System.out.printf("%d test-trainigen aangemaakt!\n", aantalTestTrainingen);
+		overzichtAlleTrainingenWeergeven();
+		ioTool.bevestigingVragenOmVerderTeGaan();
 	}
 
 	public static void main(String[] args) {
-		// TODO: gegevens ophalen van bestand of factory naargelang gebruikte
-		// constructor?
-		TrainingBeheer beheerder = new TrainingBeheer(3);
-		beheerder.startMenu();
+		// TODO: gegevens ophalen van bestand of maken naargelang constructor?
+		// TrainingBeheer beheerder = new TrainingBeheer(); // normaal
+		TrainingBeheer beheerder = new TrainingBeheer(0); // test
+		beheerder.startMenu(); // starten :p
 	}
 
 	public void startMenu() {
@@ -50,7 +85,7 @@ public class TrainingBeheer {
 		do {
 			try {
 				printMenu();
-				switch (vraagInteger("Uw menu keuze > ")) {
+				switch (ioTool.vraagInteger("Uw menu keuze > ")) {
 				case 1: // Nieuwe training invoeren
 					optieNieuweTrainingInvoeren();
 					break;
@@ -59,11 +94,15 @@ public class TrainingBeheer {
 					optieOverzichtTrainingenWeergeven();
 					break;
 
-				case 3: // Training verwijderen
+				case 3: // Overzicht trainingen
+					optieOverzichtTrainingenPerSportWeergeven();
+					break;
+
+				case 4: // Training verwijderen
 					optieTrainingVerwijderen();
 					break;
 
-				case 9: // Stoppen
+				case 99: // Stoppen
 					runningLoop = false;
 					break;
 				default: // Ongeldige keuze
@@ -82,268 +121,100 @@ public class TrainingBeheer {
 		System.out.println("Tot ziens.");
 	}
 
-	private int vraagInteger(String vraag) {
-		do {
-			try {
-				System.out.print(vraag);
-				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				return Integer.parseInt(reader.readLine());
-			} catch (IOException ex) {
-				System.out.println("General I/O exception: " + ex.getMessage());
-				ex.printStackTrace();
-			} catch (NumberFormatException ex) {
-				System.out.println("Gelieve een geheel getal in te geven.");
-			}
-		} while (true);
-	}
-	
-	private long vraagLong(String vraag) {
-		do {
-			try {
-				System.out.print(vraag);
-				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				return Long.parseLong(reader.readLine());
-			} catch (IOException ex) {
-				System.out.println("General I/O exception: " + ex.getMessage());
-				ex.printStackTrace();
-			} catch (NumberFormatException ex) {
-				System.out.println("Gelieve een geheel getal in te geven.");
-			}
-		} while (true);
-	}
-
-	private double vraagDouble(String vraag) {
-		do {
-			try {
-				System.out.print(vraag);
-				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				return Double.parseDouble(reader.readLine());
-			} catch (IOException ex) {
-				System.out.println("General I/O exception: " + ex.getMessage());
-				ex.printStackTrace();
-			} catch (NumberFormatException ex) {
-				System.out.println("Gelieve een decimaal getal in te geven.");
-			}
-		} while (true);
-	}
-	
-	private Address vraagAdres_Address()
-	{
-		System.out.println("Adres:");
-		Address adres = new Address();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		
-		System.out.print("straat > ");
-		try {
-			adres.setStreet(reader.readLine());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.print("bus nr. > ");
-		try {
-			adres.setNumber(reader.readLine());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.print("Post code > ");
-		try {
-			adres.setZipCode(reader.readLine());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.print("Gemeente > ");
-		try {
-			adres.setCity(reader.readLine());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return adres;
-	}
-	
-	private Calendar vraagDatum_Calendar()
-	{
-		Calendar cal = Calendar.getInstance();
-		
-		// Jaar
-		int jaar = vraagInteger("Jaar van training(0=" + cal.get(Calendar.YEAR) + ") > ");
-		if( jaar == 0 ) 
-		{
-		jaar = cal.get(Calendar.YEAR);
-		System.out.println(" = " + jaar);
-		}
-		
-		// Maand
-		int maand;
-		do
-		{
-			maand = vraagInteger("Maand van training(1>=x<=12) > ");
-		} while( maand < 1 || maand > 12 );
-		
-		// Dag
-		int dag;
-		do
-		{
-			dag = vraagInteger("Dag van training(1>=x<=31) > ");
-		} while( dag < 1 || dag > 31 );
-		return new GregorianCalendar(jaar, maand-1, dag);
-	}
-	
-	private ESportType vraagTypeSport_ESportType()
-	{
-		do {
-			try {
-				System.out.print("Type sport(w,l,s,z,f,t,?) > ");
-				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				String antwoord = reader.readLine();
-				switch(antwoord.toLowerCase()){
-				case "w":
-					return ESportType.wandelen;
-				case "l":
-					return ESportType.lopen;
-				case "s":
-					return ESportType.sprinten;
-				case "z":
-					return ESportType.zwemmen;
-				case "f":
-					return ESportType.fietsen;
-				case "t":
-					return ESportType.triathlon;
-				case "?":
-					System.out.println("Sport types:");
-					System.out.println(" w = Wandelen");
-					System.out.println(" l = Lopen");
-					System.out.println(" s = Sprinten");
-					System.out.println(" z = Zwemmen");
-					System.out.println(" f = Fietsen");
-					System.out.println(" t = Triathlon");
-					break;
-				default:
-					System.out.println("Ongeldige keuze. Gebruik \"?\" voor meer informatie.");
-				}
-
-			} catch (IOException ex) {
-				System.out.println("General I/O exception: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		} while (true);
-	}
-
-	private boolean akkoordVragenOmOpdrachtDoorTeVoeren(String vraag)
-	{
-		do {
-			try {
-				System.out.print(vraag + "(j/n) > ");
-				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				String antwoord = reader.readLine();
-				switch(antwoord.toLowerCase()){
-				case "j":
-				case "1":
-					return true;
-				case "n":
-				case "0":
-					return false;
-				case "?":
-					System.out.println("Opties:");
-					System.out.println(" j = ja / true");
-					System.out.println(" n = neen / false");
-					System.out.println(" 1 = ja / true");
-					System.out.println(" 0 = neen / false");
-					break;
-				default:
-					System.out.println("Ongeldige keuze. Gebruik \"?\" voor meer informatie.");
-				}
-
-			} catch (IOException ex) {
-				System.out.println("General I/O exception: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		} while (true);
-	}
-
-	private void bevestigingVragenOmVerderTeGaan()
-	{
-		System.out.println("Druk [enter] om verder te gaan.");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			@SuppressWarnings("unused")
-			String temp = reader.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	private void printMenu() {
 		System.out.println("TrainingBeheerder:");
 		System.out.println("------------------");
 		System.out.println("\nMenu:");
 		System.out.println(" 1.\tNieuwe training invoeren");
-		System.out.println(" 2.\tOverzicht trainingen");
-		System.out.println(" 3.\tTraining verwijderen");
-		System.out.println(" 9.\tStoppen\n");
+		System.out.println(" 2.\tOverzicht alle trainingen");
+		System.out.println(" 3.\tOverzicht van trainingen per sport");
+		System.out.println(" 4.\tLaatst ingegeven training verwijderen");
+		System.out.println(" 99.\tStoppen\n");
 	}
 
 	private void optieNieuweTrainingInvoeren() {
-		System.out.println("\nNieuwe training:");
+		System.out.println("\nNieuwe training invoeren:");
+		System.out.println("-------------------------\n");
 
-		ESportType type = vraagTypeSport_ESportType();
+		ESportType type = ioTool.vraagTypeSport_ESportType();
 		System.out.println(" = " + type.toString());
-		
-		Calendar datum = vraagDatum_Calendar();
+
+		Calendar datum = ioTool.vraagDatumVoorVandaag_Calendar();
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 		System.out.println(" = " + format1.format(datum.getTime()));
-		
-		double afstand = vraagDouble("Afstand in km > ");
-		
-		long tijdInSec = vraagLong("Tijd in sec > ");
-		
-		Address adres = vraagAdres_Address();
-		
+
+		double afstand = ioTool.vraagDouble("Afstand in km > ");
+
+		long tijdInSec = ioTool.vraagLong("Tijd in sec > ");
+
+		Address adres = ioTool.vraagAdres_Address();
+
 		Training training = new Training(type, datum, afstand, tijdInSec, adres);
-		//System.out.println(" = " + training.toString());
-		
-		if( akkoordVragenOmOpdrachtDoorTeVoeren( 
-				"Training = " + training.toString()
-				+ "\nAdres:\n" + training.getAdres().toString() + "\nZijn deze gegevens correct?") == true )
-		{
+		// System.out.println(" = " + training.toString());
+
+		if (ioTool.akkoordVragenOmOpdrachtDoorTeVoeren("Training = " + training.toString() + "\nAdres:\n"
+				+ training.getAdres().toString() + "\nZijn deze gegevens correct?") == true) {
 			manager.addTraining(training);
 			overzichtAlleTrainingenWeergeven();
 			System.out.println("Training ingevoerd.\n");
-			bevestigingVragenOmVerderTeGaan();
+			ioTool.bevestigingVragenOmVerderTeGaan();
 		}
 	}
 
 	private void optieOverzichtTrainingenWeergeven() {
-		System.out.println("\nOverzicht trainingen:");
+		System.out.println("\nOverzicht van all trainingen:");
+		System.out.println("-----------------------------\n");
 		overzichtAlleTrainingenWeergeven();
-		bevestigingVragenOmVerderTeGaan();
+		ioTool.bevestigingVragenOmVerderTeGaan();
 	}
-	
-	private void overzichtAlleTrainingenWeergeven()
-	{
+
+	private void optieOverzichtTrainingenPerSportWeergeven() {
+		System.out.println("\nOverzicht van trainingen per sport:");
+		System.out.println("-----------------------------------\n");
+		ESportType type = ioTool.vraagTypeSport_ESportType();
 		ArrayList<Training> list = manager.getAlleTrainingen();
-		if( list.size() > 0 )
-		{
+		if (list.size() > 0) {
 			int index = 1;
-			for(Iterator<Training> i = list.iterator(); i.hasNext(); )
-			{
+			for (Iterator<Training> i = list.iterator(); i.hasNext();) {
+				Training t = i.next();
+				if (t.getType() == type) {
+					System.out.println(" " + index + ".\t" + t);
+					index++;
+				}
+			}
+		}
+		System.out.println("<LIST_END>\n");
+		ioTool.bevestigingVragenOmVerderTeGaan();
+	}
+
+	private void overzichtAlleTrainingenWeergeven() {
+		ArrayList<Training> list = manager.getAlleTrainingen();
+		if (list.size() > 0) {
+			int index = 1;
+			for (Iterator<Training> i = list.iterator(); i.hasNext();) {
 				Training t = i.next();
 				System.out.println(" " + index + ".\t" + t);
 				index++;
 			}
 		}
-		System.out.println("<LIST_END>\n");	
+		System.out.println("<LIST_END>\n");
 	}
 
 	private void optieTrainingVerwijderen() {
-		System.out.println("\nTraining verwijderen:");
-		bevestigingVragenOmVerderTeGaan();
+		System.out.println("\nLaatst ingegeven training verwijderen:");
+		System.out.println("--------------------------------------\n");
+		Training laatsteTraining = manager.getLastTraining();
+		if (laatsteTraining == null) {
+			System.out.println("Er is niets om te verwijderen.\n");
+		} else {
+			if (ioTool.akkoordVragenOmOpdrachtDoorTeVoeren(
+					"De laatst-ingevoerde Training:\n" + laatsteTraining.toString() + "\nAdres:\n"
+							+ laatsteTraining.getAdres().toString()+ "\nVerwijderen?") == true) {
+				manager.removeLastTraining();
+				overzichtAlleTrainingenWeergeven();
+				System.out.println("Training verwijderd.\n");
+			}
+		}
+		ioTool.bevestigingVragenOmVerderTeGaan();
 	}
 }

@@ -28,4 +28,13 @@ public class TrainingManager {
 		ArrayList<Training> clone = (ArrayList<Training>) list.clone();
 		return clone;
 	}
+	
+	public Training getLastTraining() {
+		if(list.size()== 0) return null;
+		return list.get(list.size()-1).clone();
+	}
+	
+	public void removeLastTraining() {
+		list.remove(list.size()-1);
+	}
 }
