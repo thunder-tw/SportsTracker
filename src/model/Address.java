@@ -152,7 +152,7 @@ public class Address {
 	public void setFax(String fax) {
 		this.fax = fax;
 	}
-
+	
 	public String toString() {
 		return String.format("%s %s bus %s\n%s %s\n%s\nTel.: %s\nGsm.: %s\nFax: %s", getStreet(), getNumber(), getBox(),
 				getZipCode(), getCity(), getEmail(), getPhone(),

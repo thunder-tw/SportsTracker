@@ -8,21 +8,23 @@
 
 package model;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class Training implements Cloneable {
 	private ESportType type; // Type Training/sport
+	private Calendar  datum; // wanneer de training afspeelde
 	private double afstand; // afgelegde afstand in km, tijdens de training
 	private long tijdInSec; // gebruikte tijd voor de training in sec
-	private Date datum; // wanneer de training afspeelde
 	private Address adres; // waar de training afspeelde
 
-	public Training(ESportType type, double afstand, long tijdInSec, Date datum, Address adres) {
+	public Training(ESportType type, Calendar  datum, double afstand, long tijdInSec, Address adres) {
 		this.type = type;
+		this.datum = datum;
 		this.afstand = afstand;
 		this.tijdInSec = tijdInSec;
-		this.datum = datum;
 		this.adres = adres;
 	}
 
@@ -38,7 +40,7 @@ public class Training implements Cloneable {
 		return tijdInSec;
 	}
 	
-	public Date getDatum()
+	public Calendar getDatum()
 	{ return datum; }
 	
 	public Address getAdres(){
@@ -46,10 +48,11 @@ public class Training implements Cloneable {
 	}
 
 	public String toString() {
-		return "testje " + type.toString() + " " + afstand;
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		return String.format("%-12s\t%s\t%.2fkm.\t%dsec.", type.toString(), format1.format(datum.getTime()), afstand, tijdInSec);
 	}
 
 	public Training clone() {
-		return new Training(type, afstand, tijdInSec, datum, adres);
+		return new Training(type, datum, afstand, tijdInSec, adres);
 	}
 }
