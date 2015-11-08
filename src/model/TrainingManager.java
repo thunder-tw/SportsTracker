@@ -11,4 +11,21 @@ import java.util.ArrayList;
 
 public class TrainingManager {
 	ArrayList<Training> list;
+
+	public TrainingManager() {
+		list = new ArrayList<Training>();
+	}
+	
+	public void addTraining( Training training )
+	{
+		list.add(training);
+	}
+
+	// TODO: functies die een gefilterde lijst van trainingen terug geven (type,
+	// datum)
+	public ArrayList<Training> getAlleTrainingen() {
+		@SuppressWarnings("unchecked")
+		ArrayList<Training> clone = (ArrayList<Training>) list.clone();
+		return clone;
+	}
 }

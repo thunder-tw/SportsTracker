@@ -13,5 +13,5 @@ public enum ESportType {
 	sprinten,
 	zwemmen,
 	fietsen,
-	skeeleren,
+	triathlon,
 }
